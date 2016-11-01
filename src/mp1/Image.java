@@ -9,6 +9,7 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.image.ColorModel;
 
@@ -16,11 +17,12 @@ class Image extends JFrame {
 
     JTextField jTextArea1 = new JTextField();
     JTextField jTextArea2 = new JTextField();
-    static int input = 1169;
+    static int input = 1169; //input/query image number
     static double[][] colorHist = new double[51][159]; //Histogram of input image and 50 images
     static int sum=0;
     static double[] rankings = new double[10];
-    static HashMap<Double, Integer> h = new HashMap<Double, Integer>();
+    static HashMap<Double, Integer> h = new HashMap<Double, Integer>(); //Hashmap of simExactCol and image filename number
+    static String path = "D:\\"; //file path of images
     
 	//shows a JPEG on the screen on the screen at x,y
 
@@ -70,7 +72,7 @@ class Image extends JFrame {
         Graphics2D g2 = (Graphics2D) g;
         
         //displays 000.jpg at C:\ in the window
-        showJPEG(pos,50,g2,"D:\\", name+".jpg");
+        showJPEG(pos,50,g2,path, name+".jpg");
         
 
     }
@@ -128,6 +130,8 @@ class Image extends JFrame {
 	    JPanel panelCenter = new JPanel();
    	    System.out.println("Starting Image...");
 	    Image mainFrame = new Image();
+	    BufferedImage bi = null;
+	    int testImageOffset = 1233;
 	    
 	    panelCenter.setSize(100,100);
 	    mainFrame.getContentPane().add(panelCenter, BorderLayout.NORTH);
@@ -147,26 +151,36 @@ class Image extends JFrame {
 		mainFrame.setTitle("Image");
 		mainFrame.setVisible(true);
 
-		for (int x = 0; x<127; x++)
-        	for(int y = 0; y<95; y++){
-        		mainFrame.getRGB(x,y,0,"D:\\",input+".jpg");	//get RGB and LUV of every pixel of input image
+		try {
+			bi = ImageIO.read(new File(path,input+".jpg"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		for (int x = 0; x<bi.getWidth(); x++) //get color hist of input image
+        	for(int y = 0; y<bi.getHeight(); y++){
+        		mainFrame.getRGB(x,y,0,path,input+".jpg");	//get RGB and LUV of every pixel of input image and put into color histogram
         	}
 		
-		for(int image = 0; image<10; image++)
-	        for (int x = 0; x<128; x++) //image x dimensions
-	        	for(int y = 0; y<96; y++){ //image y dimensions
-	        		String s = (image+100)+".jpg"; //uses images 1170-1180.jpg
-	        		mainFrame.getRGB(x,y,image+1,"D:\\",s);	//get RGB and LUV of every pixel of every test image
+		for(int image = 0; image<10; image++){ //get color hist of 10 images
+			try {
+				bi = ImageIO.read(new File(path,(image+testImageOffset)+".jpg")); //100-110.jpg
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	        for (int x = 0; x<bi.getWidth(); x++) //image x dimensions
+	        	for(int y = 0; y<bi.getHeight(); y++){ //image y dimensions
+	        		String s = (image+testImageOffset)+".jpg";
+	        		mainFrame.getRGB(x,y,image+1,path,s);	//get RGB and LUV of every pixel of every test image and put into color histogram
 	        	}
+		}
 		
         for(int x = 0; x<10; x++)
 	        for(int y = 0; y<158; y++)
 	        	colorHist[x][y] = (colorHist[x][y])/12288; //every color histogram or all images divided by w*h
         
 		mainFrame.init(1,input); //for displaying image to window
-		int highest = 0;
-		double simExactCol = 0,a,c;
-		for(int imageNo = 1; imageNo<=10; imageNo++){
+		double simExactCol = 0, a, c;
+		for(int imageNo = 1; imageNo<=10; imageNo++){ //simExactCol formula
 			simExactCol = 0;
 	        for(int f = 0; f<158; f++){
 	        	a = Math.abs(colorHist[0][f] - colorHist[imageNo][f]);
@@ -176,8 +190,8 @@ class Image extends JFrame {
 	        	}
 	        }
 	        simExactCol = simExactCol*(0.00628930817); // times 1/N where N is number of colors, 159 according to cieCOnvert.java comments
-	        rankings[imageNo-1] = -1*simExactCol;
-	        h.put(simExactCol, 99+imageNo);
+	        rankings[imageNo-1] = -1*simExactCol; //negated since Arrays.sort() sorts in ascending order, we want descending
+	        h.put(simExactCol, testImageOffset+imageNo-1); 
 		}
 		Arrays.sort(rankings); 
 		
@@ -185,6 +199,6 @@ class Image extends JFrame {
 			rankings[i] = rankings[i]*-1;
 			System.out.println(i+1 +". "+h.get(rankings[i])+": "+rankings[i]);
 		}
-		mainFrame.init(300, h.get(rankings[0]));
+		mainFrame.init(300, h.get(rankings[0])); //displays most similar image
 	}
 }
