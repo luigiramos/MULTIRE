@@ -180,6 +180,7 @@ class Image extends JFrame {
 	        h.put(simExactCol, 99+imageNo);
 		}
 		Arrays.sort(rankings); 
+		
 		for(int i = 0;i<rankings.length;i++){
 			rankings[i] = rankings[i]*-1;
 			System.out.println(i+1 +". "+h.get(rankings[i])+": "+rankings[i]);
