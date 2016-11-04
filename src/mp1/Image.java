@@ -18,7 +18,7 @@ class Image extends JFrame {
     JTextField jTextArea1 = new JTextField();
     JTextField jTextArea2 = new JTextField();
     static int input = 0; //input/query image number
-    static double[][] colorHist = new double[80][159]; //Histogram of input image and 50 images
+    static double[][] colorHist = new double[81][159]; //Histogram of input image and 50 images
     static int sum=0;
     static double[] rankings = new double[80];
     static HashMap<Double, Integer> h = new HashMap<Double, Integer>(); //Hashmap of simExactCol and image filename number
@@ -178,13 +178,14 @@ class Image extends JFrame {
         
 		mainFrame.init(1,input); //for displaying image to window
 		double simExactCol = 0, a, c;
-		for(int imageNo = 1; imageNo<=10; imageNo++){ //simExactCol formula
+		for(int imageNo = 1; imageNo<=80; imageNo++){ //simExactCol formula
 			simExactCol = 0;
 	        for(int f = 0; f<158; f++){
 	        	a = Math.abs(colorHist[0][f] - colorHist[imageNo][f]);
 	        	c = Math.max(colorHist[0][f], colorHist[imageNo][f]);
 	        	if(c>0){ //so no divided by 0
 			        simExactCol = simExactCol + (1 - a/c);
+			        
 	        	}
 	        }
 	        simExactCol = simExactCol*(0.00628930817); // times 1/N where N is number of colors, 159 according to cieCOnvert.java comments
