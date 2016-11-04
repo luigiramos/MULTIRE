@@ -17,10 +17,10 @@ class Image extends JFrame {
 
     JTextField jTextArea1 = new JTextField();
     JTextField jTextArea2 = new JTextField();
-    static int input = 1169; //input/query image number
-    static double[][] colorHist = new double[51][159]; //Histogram of input image and 50 images
+    static int input = 0; //input/query image number
+    static double[][] colorHist = new double[80][159]; //Histogram of input image and 50 images
     static int sum=0;
-    static double[] rankings = new double[10];
+    static double[] rankings = new double[80];
     static HashMap<Double, Integer> h = new HashMap<Double, Integer>(); //Hashmap of simExactCol and image filename number
     static String path = "D:\\"; //file path of images
     
@@ -131,7 +131,7 @@ class Image extends JFrame {
    	    System.out.println("Starting Image...");
 	    Image mainFrame = new Image();
 	    BufferedImage bi = null;
-	    int testImageOffset = 1233;
+	    int testImageOffset = 100;
 	    
 	    panelCenter.setSize(100,100);
 	    mainFrame.getContentPane().add(panelCenter, BorderLayout.NORTH);
@@ -161,7 +161,7 @@ class Image extends JFrame {
         		mainFrame.getRGB(x,y,0,path,input+".jpg");	//get RGB and LUV of every pixel of input image and put into color histogram
         	}
 		
-		for(int image = 0; image<10; image++){ //get color hist of 10 images
+		for(int image = 0; image<80; image++){ //get color hist of 10 images
 			try {
 				bi = ImageIO.read(new File(path,(image+testImageOffset)+".jpg")); //100-110.jpg
 			} catch (IOException e) {
@@ -172,11 +172,9 @@ class Image extends JFrame {
 	        		String s = (image+testImageOffset)+".jpg";
 	        		mainFrame.getRGB(x,y,image+1,path,s);	//get RGB and LUV of every pixel of every test image and put into color histogram
 	        	}
-		}
-		
-        for(int x = 0; x<10; x++)
 	        for(int y = 0; y<158; y++)
-	        	colorHist[x][y] = (colorHist[x][y])/12288; //every color histogram or all images divided by w*h
+	        	colorHist[image][y] = (colorHist[image][y])/(bi.getHeight()*bi.getWidth()); //every color histogram or all images divided by w*h
+		}
         
 		mainFrame.init(1,input); //for displaying image to window
 		double simExactCol = 0, a, c;
